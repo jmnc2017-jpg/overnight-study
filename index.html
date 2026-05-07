@@ -396,16 +396,41 @@ document.getElementById("sortSelect").addEventListener("change", (e) => {
   render();
 });
 
+function loadData(data) {
+  rawStocks = data.stocks || data.results || [];
+  document.getElementById("marketLine").textContent = getMarketLine(data);
+  document.getElementById("generated").textContent = data.generated_at ? `생성시각: ${data.generated_at}` : "";
+  render();
+}
+
+async function autoLoadJson() {
+  const marketLine = document.getElementById("marketLine");
+  try {
+    marketLine.textContent = "screened_stocks.json 자동 로딩 중...";
+    const res = await fetch("screened_stocks.json", { cache: "no-store" });
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    loadData(data);
+  } catch (err) {
+    console.warn("자동 JSON 로딩 실패:", err);
+    marketLine.textContent = "파일 불러오기 실패";
+    document.getElementById("generated").textContent =
+      "screened_stocks.json 자동 로딩에 실패했습니다. 우측 파일 선택으로 직접 불러올 수 있습니다.";
+    render();
+  }
+}
+
 document.getElementById("file").addEventListener("change", async (e) => {
   const file = e.target.files[0];
   if (!file) return;
   const text = await file.text();
   const data = JSON.parse(text);
-  rawStocks = data.stocks || data.results || [];
-  document.getElementById("marketLine").textContent = getMarketLine(data);
-  document.getElementById("generated").textContent = data.generated_at ? `생성시각: ${data.generated_at}` : "";
-  render();
+  loadData(data);
 });
+
+document.addEventListener("DOMContentLoaded", autoLoadJson);
 </script>
 </body>
 </html>
