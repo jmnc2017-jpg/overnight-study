@@ -46,9 +46,7 @@ jobs:
 
       - name: Prepare dashboard files
         run: |
-          mkdir -p docs history
-          cp screened_stocks.json docs/screened_stocks.json
-          cp index.html docs/index.html
+          mkdir -p history
           DATE=$(date -u +"%Y-%m-%d_%H%M")
           cp screened_stocks.json history/${DATE}.json
 
