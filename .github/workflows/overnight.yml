@@ -48,7 +48,7 @@ jobs:
         run: |
           mkdir -p docs history
           cp screened_stocks.json docs/screened_stocks.json
-          cp overnight_dashboard_v3_synced.html docs/index.html
+          cp index.html docs/index.html
           DATE=$(date -u +"%Y-%m-%d_%H%M")
           cp screened_stocks.json history/${DATE}.json
 
