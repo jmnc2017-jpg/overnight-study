@@ -188,6 +188,61 @@
       line-height: 1.45;
       font-size: 14px;
     }
+    .chart-wrap {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      overflow: hidden;
+      background: rgba(0,0,0,.18);
+    }
+    .chart-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .chart-title {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .chart-buttons {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .chart-btn {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.07);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 5px 8px;
+      font-size: 11px;
+      cursor: pointer;
+    }
+    .chart-btn:hover {
+      background: rgba(108,168,255,.20);
+      border-color: rgba(108,168,255,.45);
+    }
+    .tv-chart-box {
+      width: 100%;
+      height: 300px;
+      background: #0b1020;
+    }
+    .tv-chart-box iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    @media (max-width: 900px) {
+      .tv-chart-box { height: 260px; }
+      .chart-head { align-items: flex-start; flex-direction: column; }
+      .chart-buttons { justify-content: flex-start; }
+    }
     .empty {
       text-align: center;
       color: var(--muted);
@@ -197,7 +252,30 @@
       margin-top: 24px;
     }
     .footer-note { color: var(--muted); font-size: 12px; margin-top: 18px; }
-  </style>
+  
+    .naver-chart-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      padding: 8px;
+    }
+    .naver-chart-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      border-radius: 8px;
+      background: #fff;
+    }
+    .chart-error {
+      color: var(--muted);
+      font-size: 13px;
+      padding: 30px;
+      text-align: center;
+    }
+
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -300,6 +378,30 @@ function passFilter(s) {
   return true;
 }
 
+
+
+function chartCode(s) {
+  return String(s.ticker || "").trim().padStart(6, "0");
+}
+
+function makeNaverChartUrl(code, period = "day") {
+  // 네이버 금융 정적 차트 이미지
+  // period: day, week, month, year, year3, year5
+  return `https://ssl.pstatic.net/imgfinance/chart/item/area/${period}/${code}.png`;
+}
+
+function changeChart(button, period) {
+  const wrap = button.closest(".chart-wrap");
+  if (!wrap) return;
+  const img = wrap.querySelector("img");
+  const code = wrap.dataset.code || "005930";
+  if (img) {
+    img.src = makeNaverChartUrl(code, period) + `?t=${Date.now()}`;
+  }
+  wrap.querySelectorAll(".chart-btn").forEach(b => b.classList.remove("active"));
+  button.classList.add("active");
+}
+
 function card(s, i) {
   const flags = s.flags || "";
   const rr = Number(s.rr_ratio || s.rr || s.risk_reward || 0);
@@ -346,6 +448,27 @@ function card(s, i) {
       <div class="metric"><div class="label">기대갭</div><div class="value">${pct(targetPct)}</div></div>
       <div class="metric"><div class="label">목표가</div><div class="value">${won(s.target_price)}</div></div>
       <div class="metric"><div class="label">리스크선</div><div class="value">${won(s.risk_price || s.stop_price)} ${stopPct !== "" ? `(${pct(stopPct)})` : ""}</div></div>
+    </div>
+
+    <div class="chart-wrap" data-code="${chartCode(s)}">
+      <div class="chart-head">
+        <div class="chart-title">📈 네이버 금융 차트 · ${chartCode(s)}</div>
+        <div class="chart-buttons">
+          <button class="chart-btn active" onclick="changeChart(this, 'day')">일</button>
+          <button class="chart-btn" onclick="changeChart(this, 'week')">주</button>
+          <button class="chart-btn" onclick="changeChart(this, 'month')">월</button>
+          <button class="chart-btn" onclick="changeChart(this, 'year')">1년</button>
+          <button class="chart-btn" onclick="changeChart(this, 'year3')">3년</button>
+          <button class="chart-btn" onclick="changeChart(this, 'year5')">5년</button>
+        </div>
+      </div>
+      <div class="tv-chart-box naver-chart-box">
+        <img
+          loading="lazy"
+          src="${makeNaverChartUrl(chartCode(s), 'day')}"
+          alt="${s.name || ''} 네이버 금융 차트"
+          onerror="this.closest('.tv-chart-box').innerHTML='<div class=&quot;chart-error&quot;>차트 이미지를 불러오지 못했습니다.</div>'">
+      </div>
     </div>
 
     <div class="comment">💬 ${makeComment(s)}</div>
