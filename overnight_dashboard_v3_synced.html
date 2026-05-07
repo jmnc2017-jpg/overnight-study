@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>오버나잇 후보 리포트 대시보드</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121a2f;
+      --panel2: #18223b;
+      --text: #eef3ff;
+      --muted: #93a4c7;
+      --line: rgba(255,255,255,.10);
+      --good: #35d07f;
+      --warn: #ffc857;
+      --bad: #ff6673;
+      --blue: #6ca8ff;
+      --purple: #b18cff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", Roboto, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(88, 130, 255, .18), transparent 34%),
+        radial-gradient(circle at top right, rgba(65, 211, 142, .13), transparent 28%),
+        var(--bg);
+      color: var(--text);
+      padding: 28px;
+    }
+    .wrap { max-width: 1280px; margin: 0 auto; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 30px;
+      letter-spacing: -0.04em;
+    }
+    .sub { color: var(--muted); margin-top: 7px; font-size: 14px; }
+    .upload {
+      min-width: 330px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px;
+    }
+    input[type=file] { width: 100%; color: var(--muted); }
+    .market {
+      background: linear-gradient(135deg, rgba(108,168,255,.16), rgba(53,208,127,.10));
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 18px;
+      margin: 18px 0;
+      box-shadow: 0 18px 60px rgba(0,0,0,.22);
+    }
+    .market-title { font-size: 15px; color: var(--muted); margin-bottom: 10px; }
+    .market-line { font-size: 22px; font-weight: 800; letter-spacing: -0.03em; }
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin: 18px 0;
+    }
+    .chip {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .chip.active { background: rgba(108,168,255,.24); border-color: rgba(108,168,255,.55); }
+    .sort-select {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-size: 13px;
+      outline: none;
+      margin-left: auto;
+      min-width: 190px;
+    }
+    .sort-select option {
+      background: #121a2f;
+      color: var(--text);
+    }
+    @media (max-width: 900px) {
+      .sort-select { margin-left: 0; width: 100%; }
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+    @media (max-width: 900px) {
+      body { padding: 16px; }
+      header { flex-direction: column; }
+      .upload { min-width: 100%; }
+      .grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.035));
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.20);
+      position: relative;
+      overflow: hidden;
+    }
+    .card:before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--blue), var(--good));
+      opacity: .8;
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .rank { color: var(--muted); font-size: 14px; }
+    .name {
+      font-size: 22px;
+      font-weight: 850;
+      letter-spacing: -0.04em;
+      margin-top: 2px;
+    }
+    .ticker { color: var(--muted); font-size: 13px; margin-left: 4px; }
+    .price { color: var(--muted); margin-top: 4px; font-size: 14px; }
+    .score {
+      font-size: 26px;
+      font-weight: 900;
+      text-align: right;
+    }
+    .flags { text-align: right; font-size: 20px; margin-top: 4px; min-height: 26px; }
+    .badges { display: flex; flex-wrap: wrap; gap: 7px; margin: 12px 0; }
+    .badge {
+      font-size: 12px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+    .badge.good { color: var(--good); border-color: rgba(53,208,127,.35); background: rgba(53,208,127,.08); }
+    .badge.warn { color: var(--warn); border-color: rgba(255,200,87,.35); background: rgba(255,200,87,.08); }
+    .badge.bad { color: var(--bad); border-color: rgba(255,102,115,.35); background: rgba(255,102,115,.08); }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 9px;
+      margin: 14px 0;
+    }
+    .metric {
+      background: rgba(0,0,0,.18);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px;
+    }
+    .label { color: var(--muted); font-size: 11px; margin-bottom: 5px; }
+    .value { font-weight: 800; font-size: 14px; white-space: nowrap; }
+    .riskrow {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 9px;
+      margin-top: 10px;
+    }
+    .comment {
+      margin-top: 14px;
+      padding: 13px 14px;
+      border-radius: 16px;
+      background: rgba(108,168,255,.10);
+      border: 1px solid rgba(108,168,255,.22);
+      color: #dbe8ff;
+      line-height: 1.45;
+      font-size: 14px;
+    }
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 22px;
+      padding: 40px;
+      margin-top: 24px;
+    }
+    .footer-note { color: var(--muted); font-size: 12px; margin-top: 18px; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>📚 오버나잇 후보 리포트</h1>
+      <div class="sub">screened_stocks.json 파일을 불러오면 카드형 대시보드로 보여줍니다.</div>
+    </div>
+    <div class="upload">
+      <input id="file" type="file" accept=".json,application/json" />
+      <div class="sub">파이썬 실행 후 생성된 <b>screened_stocks.json</b> 선택</div>
+    </div>
+  </header>
+
+  <section class="market">
+    <div class="market-title">🌏 시황 요약</div>
+    <div id="marketLine" class="market-line">JSON 파일을 불러와 주세요.</div>
+    <div id="generated" class="sub"></div>
+  </section>
+
+  <div class="toolbar">
+    <button class="chip active" data-filter="all">전체</button>
+    <button class="chip" data-filter="nxt">NXT Y</button>
+    <button class="chip" data-filter="rr">RR ✅</button>
+    <button class="chip" data-filter="rocket">🚀 시간외 강세</button>
+    <button class="chip" data-filter="warn">⚠️ 경고</button>
+
+    <select id="sortSelect" class="sort-select">
+      <option value="score">점수 높은순</option>
+      <option value="trade">거래대금 높은순</option>
+      <option value="afterTrade">시간외 거래대금 높은순</option>
+      <option value="rr">RR 높은순</option>
+      <option value="afterChange">시간외 등락률 높은순</option>
+      <option value="expectedGap">기대갭 높은순</option>
+      <option value="marketCap">시총 높은순</option>
+    </select>
+  </div>
+
+  <main id="grid" class="grid"></main>
+  <div id="empty" class="empty">아직 표시할 데이터가 없습니다.</div>
+  <div class="footer-note">※ 투자 판단 보조용 화면입니다. 실제 매매 전 호가·뉴스·시장상황을 다시 확인하세요.</div>
+</div>
+
+<script>
+let rawStocks = [];
+let currentFilter = "all";
+let currentSort = "score";
+
+const fmtNum = (n) => {
+  if (n === undefined || n === null || n === "" || Number.isNaN(Number(n))) return "-";
+  return Number(n).toLocaleString("ko-KR");
+};
+const pct = (n, sign=true) => {
+  if (n === undefined || n === null || n === "" || Number.isNaN(Number(n))) return "-";
+  const v = Number(n);
+  return `${sign && v > 0 ? "+" : ""}${v.toFixed(1)}%`;
+};
+const won = (n) => n ? `₩${fmtNum(n)}` : "-";
+
+function rrMark(rr) {
+  const v = Number(rr || 0);
+  if (v >= 1.2) return "✅";
+  if (v >= 0.7) return "⚠️";
+  return "❌";
+}
+function badgeClassForNxt(nxt) {
+  if (nxt === "Y") return "good";
+  if (nxt === "미지원") return "bad";
+  return "warn";
+}
+
+function getMarketLine(data) {
+  if (data.market?.summary_text) return data.market?.summary_text;
+  if (data.market && typeof data.market === "object") {
+    const m = data.market;
+    return `코스피 ${pct(m.kospi)} / 코스닥 ${pct(m.kosdaq)} / 나스닥선물 ${pct(m.nasdaq_future)} / SOX ${pct(m.sox)} / 환율 ${pct(m.usdkrw)} | 시장판정: ${m.mode || "-"}`;
+  }
+  return "[시황] 코스피 - / 코스닥 - / 나스닥선물 -";
+}
+
+function makeComment(s) {
+  if (s.ai_comment) return s.ai_comment;
+  if (s.comment) return s.comment;
+  const parts = [];
+  if ((s.close_position || 0) >= .9) parts.push("고가권 마감");
+  if ((s.after_change || 0) >= 1) parts.push(`시간외 ${pct(s.after_change)}`);
+  if ((s.up_streak || 0) >= 3) parts.push(`${s.up_streak}봉 연속상승`);
+  if (s.foreign > 0 && s.inst > 0) parts.push("외국인+기관 동반매수");
+  if (s.rr && Number(s.rr) < .7) parts.push("RR 낮음");
+  if ((s.after_change || 0) <= -1) parts.push("시간외 약세");
+  return parts.length ? `${parts.join(" + ")} → 익일 갭 대응 관찰` : "핵심 지표 추가 확인 필요";
+}
+
+function passFilter(s) {
+  if (currentFilter === "all") return true;
+  if (currentFilter === "nxt") return s.after_status === "Y";
+  if (currentFilter === "rr") return Number(s.rr || 0) >= 1.2;
+  if (currentFilter === "rocket") return String(s.flags || "").includes("🚀");
+  if (currentFilter === "warn") return String(s.flags || "").includes("⚠️");
+  return true;
+}
+
+function card(s, i) {
+  const flags = s.flags || "";
+  const rr = Number(s.rr_ratio || s.rr || s.risk_reward || 0);
+  const closePos = s.close_position ? `${Math.round(s.close_position * 100)}%` : (s.close_strength ? `${s.close_strength}%` : "-");
+  const stopPct = s.stop_loss_pct ?? s.risk_pct ?? "";
+  const targetPct = s.expected_gap_pct ?? s.expected_gap ?? "";
+  const material = s.material || s.material_type || "기타";
+  const nxt = s.after_status || s.nxt || "-";
+  const marketCap = s.market_cap ? `${fmtNum(s.market_cap)}억` : "-";
+
+  return `
+  <article class="card">
+    <div class="top">
+      <div>
+        <div class="rank">#${i + 1}</div>
+        <div class="name">${s.name || "-"} <span class="ticker">(${s.ticker || "-"})</span></div>
+        <div class="price">${won(s.close)} · 시총 ${marketCap}</div>
+      </div>
+      <div>
+        <div class="score">${s.total_score ?? s.score ?? "-"}점</div>
+        <div class="flags">${flags}</div>
+      </div>
+    </div>
+
+    <div class="badges">
+      <span class="badge ${badgeClassForNxt(nxt)}">NXT ${nxt}</span>
+      <span class="badge">${material}</span>
+      <span class="badge ${rr >= 1.2 ? "good" : rr >= .7 ? "warn" : "bad"}">RR ${rr ? rr.toFixed(2) : "-"} ${rrMark(rr)}</span>
+      <span class="badge ${s.after_change >= 1 ? "good" : s.after_change <= -1 ? "bad" : ""}">시간외 ${pct(s.after_change)}</span>
+    </div>
+
+    <div class="metrics">
+      <div class="metric"><div class="label">고가권</div><div class="value">${closePos}</div></div>
+      <div class="metric"><div class="label">윗꼬리</div><div class="value">${pct(s.upper_wick_pct, false)}</div></div>
+      <div class="metric"><div class="label">전일고가돌파</div><div class="value">${pct(s.prev_high_break_pct)}</div></div>
+      <div class="metric"><div class="label">연속상승</div><div class="value">${s.up_streak ? s.up_streak + "봉" : "-"}</div></div>
+      <div class="metric"><div class="label">거래대금</div><div class="value">${fmtNum(s.trade_amount)}억</div></div>
+      <div class="metric"><div class="label">외대금</div><div class="value">${(s.after_amount || s.after_trade_amount) ? fmtNum(s.after_amount || s.after_trade_amount) + "억" : "-"}</div></div>
+      <div class="metric"><div class="label">외비</div><div class="value">${pct(s.after_volume_ratio, false)}</div></div>
+      <div class="metric"><div class="label">갭</div><div class="value">${pct(s.gap_up_pct)}</div></div>
+    </div>
+
+    <div class="riskrow">
+      <div class="metric"><div class="label">기대갭</div><div class="value">${pct(targetPct)}</div></div>
+      <div class="metric"><div class="label">목표가</div><div class="value">${won(s.target_price)}</div></div>
+      <div class="metric"><div class="label">리스크선</div><div class="value">${won(s.risk_price || s.stop_price)} ${stopPct !== "" ? `(${pct(stopPct)})` : ""}</div></div>
+    </div>
+
+    <div class="comment">💬 ${makeComment(s)}</div>
+  </article>`;
+}
+
+function sortValue(s, key) {
+  switch (key) {
+    case "trade":
+      return Number(s.trade_amount || 0);
+    case "afterTrade":
+      return Number(s.after_amount || s.after_trade_amount || 0);
+    case "rr":
+      return Number(s.rr_ratio || s.rr || s.risk_reward || 0);
+    case "afterChange":
+      return Number(s.after_change || 0);
+    case "expectedGap":
+      return Number(s.expected_gap_pct || s.expected_gap || 0);
+    case "marketCap":
+      return Number(s.market_cap || 0);
+    case "score":
+    default:
+      return Number(s.total_score || s.score || 0);
+  }
+}
+
+function render() {
+  const grid = document.getElementById("grid");
+  const filtered = rawStocks
+    .filter(passFilter)
+    .slice()
+    .sort((a, b) => sortValue(b, currentSort) - sortValue(a, currentSort));
+  grid.innerHTML = filtered.map(card).join("");
+  document.getElementById("empty").style.display = filtered.length ? "none" : "block";
+}
+
+document.querySelectorAll(".chip").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".chip").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentFilter = btn.dataset.filter;
+    render();
+  });
+});
+
+document.getElementById("sortSelect").addEventListener("change", (e) => {
+  currentSort = e.target.value;
+  render();
+});
+
+document.getElementById("file").addEventListener("change", async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const text = await file.text();
+  const data = JSON.parse(text);
+  rawStocks = data.stocks || data.results || [];
+  document.getElementById("marketLine").textContent = getMarketLine(data);
+  document.getElementById("generated").textContent = data.generated_at ? `생성시각: ${data.generated_at}` : "";
+  render();
+});
+</script>
+</body>
+</html>
