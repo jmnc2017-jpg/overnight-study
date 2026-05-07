@@ -1,0 +1,69 @@
+name: Overnight Screener
+
+on:
+  workflow_dispatch:
+  schedule:
+    # GitHub Actions는 UTC 기준입니다.
+    # KST 15:40 = UTC 06:40
+    - cron: "40 6 * * 1-5"
+    # KST 19:00 = UTC 10:00
+    - cron: "0 10 * * 1-5"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  run-screener:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run screener
+        env:
+          KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+          KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          MARKET_NASDAQ_FUTURE: ${{ secrets.MARKET_NASDAQ_FUTURE }}
+          MARKET_SOX: ${{ secrets.MARKET_SOX }}
+          MARKET_USDKRW: ${{ secrets.MARKET_USDKRW }}
+        run: |
+          python overnight_screener_v6_6_report_view.py --top 20
+
+      - name: Prepare dashboard files
+        run: |
+          mkdir -p docs history
+          cp screened_stocks.json docs/screened_stocks.json
+          cp overnight_dashboard_v3_synced.html docs/index.html
+          DATE=$(date -u +"%Y-%m-%d_%H%M")
+          cp screened_stocks.json history/${DATE}.json
+
+      - name: Send Telegram
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          DASHBOARD_URL: ${{ secrets.DASHBOARD_URL }}
+        run: |
+          python telegram_notifier.py
+
+      - name: Commit generated files
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add docs/screened_stocks.json docs/index.html history/*.json
+          git commit -m "Update overnight screener results" || echo "No changes to commit"
+          git push
