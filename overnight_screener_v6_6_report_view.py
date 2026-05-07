@@ -2158,8 +2158,6 @@ def main():
 
     print(f"\n 🎯 총 {len(top)}개 후보 추출 완료!")
     print(f" → {CONFIG['json_path']} 를 대시보드에 붙여넣으세요.")
-    input("\n아무 키나 누르면 종료...")
-
 
 if __name__ == "__main__":
     main()
