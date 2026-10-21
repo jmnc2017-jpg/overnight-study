@@ -1,10 +1,10 @@
 {
   "date": "2026-10-21",
-  "generated_at": "2026-10-21 12:21",
+  "generated_at": "2026-10-21 14:57",
   "market": {
     "enabled": true,
     "mode": "강세장",
-    "raw_score": 3.0,
+    "raw_score": 4.0,
     "score_adjust": 5,
     "items": {
       "kospi": {
@@ -21,29 +21,30 @@
       },
       "nasdaq_fut": {
         "name": "나스닥선물",
-        "change_pct": 0.65,
-        "value": 29868.5,
+        "change_pct": 0.73,
+        "value": 29892.25,
         "source": "yfinance"
       },
       "sox": {
         "name": "SOX",
-        "change_pct": -0.29,
-        "value": 11283.8095703125,
+        "change_pct": 1.29,
+        "value": 11428.9052734375,
         "source": "yfinance"
       },
       "usdkrw": {
         "name": "환율",
-        "change_pct": -0.34,
-        "value": 1325.47998046875,
+        "change_pct": -0.2,
+        "value": 1327.3900146484375,
         "source": "yfinance"
       }
     },
     "reasons": [
       "코스피 강세",
       "코스닥 강세",
-      "나스닥선물 강세"
+      "나스닥선물 강세",
+      "SOX 강세"
     ],
-    "summary": "코스피 +3.29% / 코스닥 +1.38% / 나스닥선물 +0.65% / SOX -0.29% / 환율 -0.34% | 시장판정: 강세장 (코스피 강세, 코스닥 강세, 나스닥선물 강세)"
+    "summary": "코스피 +3.29% / 코스닥 +1.38% / 나스닥선물 +0.73% / SOX +1.29% / 환율 -0.20% | 시장판정: 강세장 (코스피 강세, 코스닥 강세, 나스닥선물 강세)"
   },
   "stocks": [
     {
