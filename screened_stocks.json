@@ -1,6 +1,6 @@
 {
   "date": "2026-11-06",
-  "generated_at": "2026-11-06 14:36",
+  "generated_at": "2026-11-06 17:17",
   "market": {
     "enabled": true,
     "mode": "경계장",
@@ -21,20 +21,20 @@
       },
       "nasdaq_fut": {
         "name": "나스닥선물",
-        "change_pct": 1.52,
-        "value": 27158.5,
+        "change_pct": 1.62,
+        "value": 27184.25,
         "source": "yfinance"
       },
       "sox": {
         "name": "SOX",
-        "change_pct": 4.66,
-        "value": 9431.111328125,
+        "change_pct": 4.07,
+        "value": 9378.1455078125,
         "source": "yfinance"
       },
       "usdkrw": {
         "name": "환율",
-        "change_pct": 1.71,
-        "value": 1362.93994140625,
+        "change_pct": 1.61,
+        "value": 1361.6300048828125,
         "source": "yfinance"
       }
     },
@@ -45,7 +45,7 @@
       "SOX 강세",
       "환율 상승 부담"
     ],
-    "summary": "코스피 -6.02% / 코스닥 -5.03% / 나스닥선물 +1.52% / SOX +4.66% / 환율 +1.71% | 시장판정: 경계장 (코스피 약세, 코스닥 약세, 나스닥선물 강세)"
+    "summary": "코스피 -6.02% / 코스닥 -5.03% / 나스닥선물 +1.62% / SOX +4.07% / 환율 +1.61% | 시장판정: 경계장 (코스피 약세, 코스닥 약세, 나스닥선물 강세)"
   },
   "stocks": [
     {
@@ -78,11 +78,11 @@
       "after_source": "api",
       "chart_score": 33,
       "supply_score": 30,
-      "news_score": 0,
-      "news_grade": "",
+      "news_score": 20,
+      "news_grade": "제외",
       "news_kw": "",
-      "news_title": "",
-      "news_flags": "",
+      "news_title": "엘리스, 코스피·코스닥 동반 급락에도 25%대 급등…VI 잇따라 발동",
+      "news_flags": "②직접언급 ③시간외반응(추정)",
       "after_score": 10,
       "after_quality_score": 6,
       "close_strength_score": 8,
@@ -92,7 +92,7 @@
       "long_bull": true,
       "gap_up_pct": -11.58,
       "candle_score": 18,
-      "news_contrib": 0,
+      "news_contrib": 6,
       "news_grade_bonus": 0,
       "overheat_penalty": -15,
       "upper_wick_penalty": -6,
@@ -106,12 +106,12 @@
       "expected_gap_penalty": 0,
       "market_mode": "경계장",
       "market_score_adjust": -5,
-      "material_type": "기타",
-      "material_reason": "가격/수급 중심 후보",
-      "material_score_adjust": 0,
-      "total_score": 79,
+      "material_type": "섹터/뉴스",
+      "material_reason": "뉴스는 있으나 핵심 재료 분류 불명확",
+      "material_score_adjust": 2,
+      "total_score": 87,
       "memo": "",
-      "ai_comment": "상단권 마감 + 시간외 +20.9% + 외인·기관 동반매수 / 윗꼬리 부담 → 관찰 가능"
+      "ai_comment": "섹터/뉴스 재료 + 상단권 마감 + 시간외 +20.9% / 윗꼬리 부담 → 관찰 가능"
     },
     {
       "ticker": "112610",
