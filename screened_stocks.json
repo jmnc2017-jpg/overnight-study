@@ -1,6 +1,6 @@
 {
   "date": "2026-11-20",
-  "generated_at": "2026-11-20 15:45",
+  "generated_at": "2026-11-20 18:25",
   "market": {
     "enabled": true,
     "mode": "위험장",
@@ -21,20 +21,20 @@
       },
       "nasdaq_fut": {
         "name": "나스닥선물",
-        "change_pct": -2.24,
-        "value": 26003.5,
+        "change_pct": -4.04,
+        "value": 25526.0,
         "source": "yfinance"
       },
       "sox": {
         "name": "SOX",
-        "change_pct": -6.76,
-        "value": 8783.1806640625,
+        "change_pct": -8.27,
+        "value": 8640.49609375,
         "source": "yfinance"
       },
       "usdkrw": {
         "name": "환율",
-        "change_pct": 0.66,
-        "value": 1339.199951171875,
+        "change_pct": 0.95,
+        "value": 1343.0899658203125,
         "source": "yfinance"
       }
     },
@@ -45,7 +45,7 @@
       "SOX 약세",
       "환율 상승 부담"
     ],
-    "summary": "코스피 -5.21% / 코스닥 -5.71% / 나스닥선물 -2.24% / SOX -6.76% / 환율 +0.66% | 시장판정: 위험장 (코스피 약세, 코스닥 약세, 나스닥선물 약세)"
+    "summary": "코스피 -5.21% / 코스닥 -5.71% / 나스닥선물 -4.04% / SOX -8.27% / 환율 +0.95% | 시장판정: 위험장 (코스피 약세, 코스닥 약세, 나스닥선물 약세)"
   },
   "stocks": [
     {
